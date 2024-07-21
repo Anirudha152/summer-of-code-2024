@@ -1,10 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
+import dotenv
+import os
 import re
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres.slbdvralwtckymtknwan:7oa5mvhVVY16QLRJ@aws-0-ap-south-1.pooler.supabase.com:6543/postgres'
+dotenv.load_dotenv()
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
 db = SQLAlchemy(app)
 
@@ -18,11 +21,13 @@ class InventoryItem(db.Model):
     def validate_price(self, key, price):
         if price <= 0:
             raise ValueError("Price must be greater than 0")
+        return price
     Item_Qty = db.Column(db.Integer)
     @validates('Item_Qty')
     def validate_qty(self, key, qty):
         if qty < 0:
             raise ValueError("Quantity must be greater than or equal to 0")
+        return qty
 
 
 class Customer(db.Model):
